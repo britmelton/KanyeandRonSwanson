@@ -10,34 +10,42 @@ namespace KanyeandRonSwanson
 {
     public class QuoteGenerator
     {
-        public static string GetKanyeQuote()
-        {
-            var client = new HttpClient(); //make a request to the internet
 
+        private HttpClient _client;
+
+        public QuoteGenerator(HttpClient client) //make a request to the internet
+        {
+            _client = client;
+        }
+        public string GetKanyeQuote()
+        {
             var kanyeURL = "https://api.kanye.rest/";
 
-            var kanyeResponse = client.GetStringAsync(kanyeURL).Result;
+            var kanyeResponse = _client.GetStringAsync(kanyeURL).Result;
 
             var kanyeQuote = JObject.Parse(kanyeResponse).GetValue("quote").ToString();
             return kanyeQuote;
         }
-        public static string GetRonSwansonQuote()
+        public string GetRonSwansonQuote()
         {
-            var client = new HttpClient();
+          
             var ronSwansonURL = "https://ron-swanson-quotes.herokuapp.com/v2/quotes";
 
-            var ronResponse = client.GetStringAsync(ronSwansonURL).Result;
+            var ronResponse = _client.GetStringAsync(ronSwansonURL).Result;
 
             var ronQuote = JArray.Parse(ronResponse).ToString().Replace('[', ' ').Replace(']', ' ').Trim();
             return ronQuote;
         }
         public static void GenerateConversation()
         {
+
+            var client = new HttpClient();
+            var quote = new QuoteGenerator(client);
             for (int i = 0; i < 5; i++)
             {
-                var kanyeSays = QuoteGenerator.GetKanyeQuote();
+                var kanyeSays = quote.GetKanyeQuote();
                 Console.WriteLine($"Kanye: \"{kanyeSays}\"");
-                var ronSays = QuoteGenerator.GetRonSwansonQuote();
+                var ronSays = quote.GetRonSwansonQuote();
                 Console.WriteLine($"Ron Swanson: {ronSays}\n");
             }
         }
